@@ -274,3 +274,19 @@ else:
 # print(c)
 
 sys.exit(x)
+
+
+
+#строка должна быть такого вида 
+#[{
+#    'and': [{
+#            'or': [
+#                      {'model': 't1', 'field': 'f2', 'op': 'like', 'value': 'fff%'},
+#                      {'model': 't1', 'field': 'f2', 'op': 'like', 'value': 'yyy%'}
+#                     ]
+#            },
+#            {'model': 't1', 'field': 'f2', 'op': '>=', 'value': datetime.datetime.strptime('12.02.2023', '%d.%m.%Y')},
+#            {'model': 't1', 'field': 'f2', 'op': '<=', 'value': datetime.datetime.strptime('12.02.2023', '%d.%m.%Y')}
+#         ]
+#
+#}]
