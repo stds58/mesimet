@@ -1,0 +1,276 @@
+import sys
+import re
+
+#количество скобок ( и )
+def f_skobki(st):
+    stroka = st
+    a = len(stroka)
+    b = len(stroka.replace('(', ''))
+    v = len(stroka.replace(')', ''))
+    if a==b and a==v:
+        skobki = 0
+    elif a!=b and a!=v and b==v:
+        skobki = 1
+    else:
+        skobki = -1
+    return skobki
+
+def f_najti_naim_cast (st):
+    st_min = ''
+    x1 = False
+    n = -1
+    k = -1
+    i = 1
+    for b in st:
+        if b == '(':
+            n = i
+        elif b == ')' and n == -1:
+            #x1 ='ошибка. вначале стоит ) а не ('
+            x1 = 'oshika v nacale stoit ) a ne ('
+            return x1
+        elif b == ')' and n != -1:
+            k = i
+            st_min = st[n:k - 1]
+            #print(st)
+            # if st.find(' and ') == -1 and st.find(' or ') == -1 and st.find('xxx') == -1:
+            #     st = st[:len(st)-1] + ' and )'
+            #     print(st)
+            break
+        i += 1
+    if st.find('(') == -1 and st.find(')') == -1:
+        # if st.find(' and ') == -1 and st.find(' or ') == -1 and st.find('xxx') == -1:
+        #     st = st + ' and '
+        st_min = st
+    return st_min, x1
+
+def f_zamenit_znacenia_na_znac (st,sl_zn0,kluc2):
+    stn = ''
+    st = st.replace("''","'")
+    kluc = kluc2
+    while st.find("'")>0:
+        n = -1
+        k = -1
+        i = 0
+        for b in st:
+            if b == "'" and n == -1 and k == -1:
+                n = i
+            elif b == "'" and n != -1 and k == -1:
+                k = i
+                sl_zn0[kluc] = st[n + 1:k]
+                st = st[:n] + f'{kluc}znac' + st[k + 1:]
+                n = -1
+                k = -1
+                kluc += 1
+                break
+            i += 1
+    stn = st
+    return sl_zn0, stn, kluc
+
+
+def f_pervicni_slovar (st,sl_zn0 = {}):
+    model, field, op, value = '','','',''
+    x2 = False
+    oper = set()
+    sp_st = []
+    sl_zn = ''
+    sp_operator = ['like','not_like','in','not_in','==','!=','>=','<=','>','<','is_null','is_not_null']
+    st = st.replace("xxx", "xxx.xxx = xxx")
+    st = st.replace(" not in ", " not_in ")
+    st = st.replace(" not like ", " not_like ")
+    st = st.replace(" = ", " == ")
+    st = st.replace(" = = ", " == ")
+    st = st.replace(" <> ", " != ")
+    st = st.replace(" < > ", " != ")
+    st = st.replace(" < = ", " <!>= ")
+    st = st.replace(" > = ", " >= ")
+    sp_st = st.split(' ')
+    i = 1
+    for b in sp_st:
+        if i == 1:
+            model = b[: b.find('.') ]
+            field = b[b.find('.')+1:]
+        elif i == 2:
+            if b == 'like' or b == 'not_like' or b == 'in' or b == 'not_in' or b == '==' or b == '!=' or b == '>=' or b == '<=' or b == '>' or b == '<' or b == 'is_null' or b == 'is_not_null':
+                op = b
+            else:
+                #x2 = f'неверный оператор: {b}'
+                x2 = f'nevernij operator: {b}'
+                return x2, sl_zn
+        elif i == 3:
+            value = b
+        elif i == 4:
+            if b == 'and' or b =='or':
+                oper.add(b)
+            else:
+                #x2 = f'неверный оператор: {b}'
+                x2 = f'nevernij operator: {b}'
+                return x2, sl_zn
+        i += 1
+        if i > 4 and value != 'xxx':
+            sl_zn = sl_zn + '{'+f"'model': '{model}', 'field': '{field}', 'op': '{op}', 'value': '{value}'"+'},'
+            model, field, op, value = '', '', '', ''
+            i = 1
+        elif i > 4 and value == 'xxx':
+            sl_zn = sl_zn + '{'+f"'{model}'"+'},'
+            model, field, op, value = '', '', '', ''
+            i = 1
+    if value == 'xxx':
+        sl_zn = sl_zn + '{' + f"'{model}'" + '},'
+        model, field, op, value = '', '', '', ''
+    else:
+        sl_zn = sl_zn + '{' + f"'model': '{model}', 'field': '{field}', 'op': '{op}', 'value': '{value}'" + '},'
+        model, field, op, value = '', '', '', ''
+    if len(oper) == 0 and st.find('xxx') == -1:
+        st = st + ' and '
+        #print(st)
+        #x2 = 'len(oper) == 0'
+        return x2, sl_zn
+    elif len(oper) == 1:
+        for o in oper:
+            kl = o
+        sl_zn = '[{'+ f"'{kl}': [" + sl_zn + ']}]'
+    elif len(oper) >= 2:
+        #x2 = 'несколько операторов'
+        x2 = 'neskolko operatorov'
+        return x2, sl_zn
+    return x2,sl_zn
+    # print('x2',x2)
+    #print(stn, sl_zn0)
+
+def f_spisok_slovarej (st):
+    # if st.find(' and ') == -1 and st.find(' or ') == -1 and st.find('xxx') == -1 and st.find('(') == -1 and st.find(')') == -1:
+    #     st = st + ' and '
+    # elif st.find(' and ') == -1 and st.find(' or ') == -1 and st.find('xxx') == -1 and st.find('(') == 0 and st.find(')') == len(st)-1:
+    #     st = st[:len(st) - 1] + ' and )'
+    st = '(' + st + ')'
+    xx = False
+    stc = ''
+    sl_zn0 = {}
+    sl = {}
+    kluc2 = 0
+    for j in range(10):
+        st_min, x1 = f_najti_naim_cast(st)
+        if x1 != False:
+            xx = x1
+            return stc, xx, sl, sl_zn0
+        sl_zn0, stn, kluc = f_zamenit_znacenia_na_znac(st_min, sl_zn0, kluc2)
+        kluc2 = kluc
+        x2,sl_zn = f_pervicni_slovar(stn, sl_zn0)
+        if x2 != False:
+            xx = x2
+            return stc, xx, sl, sl_zn0
+        sl[j] = sl_zn
+        if st_min == st:
+            break
+        else:
+            st = st[:st.find(st_min) - 1] + f'{j}xxx' + st[st.find(st_min) + len(st_min) + 1:]
+        j += 1
+        stc = st
+    return stc, xx, sl, sl_zn0
+
+def f_zamenit_slovari (sl,sl_zn0):
+    stroka = ''
+    for kl,zn in reversed(sl.items()):
+        if kl == len(sl)-1:
+            stroka = sl.get(kl-1)
+        elif kl > 0:
+            r1 = re.findall("'\dxxx'", stroka)
+            r2 = re.findall("'\d\dxxx'", stroka)
+            r = []
+            r = r1 + r2
+            for i in r:
+                i = i.replace("'", "")
+                i = i.replace("x", "")
+                f = sl.get(int(i))
+                f = f[1:-1]
+                stroka = stroka[: stroka.find("{" + "'" + f'{i}xxx' + "'" + "},")] + f +','+ stroka[stroka.find("{" + "'" + f'{i}xxx' + "'" + "},") + 8 + len(str(i)):]
+    return stroka
+
+def f_zamenit_znacenia (stroka, sl_zn0):
+    #global itog
+    itog = ''
+    for kl,zn in sl_zn0.items():
+        a = stroka.find(f'{kl}znac')
+        stroka = stroka[:a] +sl_zn0[kl]+stroka[a+5:]
+    itog = stroka
+    if itog[:1] == '{' and itog[-2::2] == '}' and itog.find("'and':") == -1 and itog.find("'or':") == -1:
+        itog = "{'and':["+itog+"]}"
+    elif itog[:8] == "'model':" and itog[-2::2] == '}' and itog.find("'and':") == -1 and itog.find("'or':") == -1:
+        itog = "{'and':["+itog+"]}"
+    elif itog.find("},'model':") != -1:
+        p = itog.find("},'model':")
+        itog = itog[:p+2]+'{'+itog[p+2:]
+    return itog
+
+
+# in ()
+
+def f_itog(st = None):
+    #global c,osh
+    if st is None:
+        #osh = 'пустая строка'
+        osh = 'pustaja stroka'
+        c = ''
+        return osh,c
+    st = st.replace("and(", "and (")
+    st = st.replace(")and", ") and")
+    st = st.replace("or(", "or (")
+    st = st.replace(")or", ") or")
+    st = st.replace(" )", ")")
+    st = st.replace("( ", "(")
+    # st = st.replace("=", "  =  ")
+    # st = st.replace("<>", "   <>   ")
+    # st = st.replace("<", "  <  ")
+    # st = st.replace(">", "  >  ")
+    st = st.replace("  ", "")
+    #print(st)
+    c = ''
+    osh = False
+    skobki = f_skobki(st)
+    if skobki == -1:
+        #osh = 'разное количество скобок ( и )'
+        osh = 'raznoe kolicestvo skobok ( i )'
+        return osh, c
+    stc, xx, sl, sl_zn0 = f_spisok_slovarej(st)
+    if xx != False:
+        osh = xx
+        return osh,c
+    stroka = f_zamenit_slovari(sl, sl_zn0)
+    itog = f_zamenit_znacenia(stroka, sl_zn0)
+    c = itog
+    return osh,c
+
+#st = "(t1.f1 = 1)" #+
+#st = "t1.f1 = 1 and (t1.f1 = 2) and t1.f1 = 3" #+
+#st = "t1.f1 = 1" #+
+#st = "(t1.f1 = 1 and t1.f1 = 2)" #+
+#st = "(t1.f1 = 1 and t1.f1 not like 2)" #+
+#st = "t1.f1 = 1 and t1.f1 = 2" #+
+#st = "(t1.f1 = 1 and t1.f1 = 2) or t1.f1 = 3" #+
+# st = "t1.f1 = 1 and t1.f1 = 2 or t1.f1 = 3" #+ несколько операторов
+# st = "t1.f1 = 1 and t1.f1 = 2 and t1.f1 = 3" #+
+# st = "t1.f1 = 1 and (t1.f1 = 2 or t1.f1 = 3) and t1.f1 = 4" #+
+# st = "t1.f1 = 1 and (t1.f1 = 2 or t1.f1 = 3) or t1.f1 = 4" #+ несколько операторов
+# st = "(t1.f1 = 1 land t1.f1 = 2)" #+ неверный оператор: land
+# st = "t1.f1 = 1 land t1.f1 = 2" #+ неверный оператор: land
+# st = "(t1.f1 = 1 and t1.f1 = 2) lor t1.f1 = 3" #+ неверный оператор: lor
+# st = "t1.f1 = 1 land t1.f1 = 2 or t1.f1 = 3" #+ неверный оператор: land
+# st = "t1.f1 = 1 and t1.f1 = 2 land t1.f1 = 3" #+ неверный оператор: land
+# st = "t1.f1 = 1 land (t1.f1 = 2) and t1.f1 = 3" #+ неверный оператор: land
+# st = "t1.f1 = 1 and (t1.f1 = 2) or t1.f1 = 3" #+ несколько операторов
+# st = "t1.f1 = 1 and (t1.f1 = 2 or t1.f1 = 3) land t1.f1 = 4" #+ неверный оператор: land
+# st = "t1.f1 = 1 and (t1.f1 = 2 lor t1.f1 = 3) or t1.f1 = 4" #+ неверный оператор: lor
+# st = "t1.f1 not like 1" #+
+for param in sys.argv:
+        st = param
+
+#st = "t1.f1 = 1 and ((t1.f2 = ''2'' or t1.f3 = ''3     5'')or(t1.f4 = ''4'' or t1.f5 <> 5))"
+osh,c = f_itog(st)
+if not osh:
+    x = c
+else:
+    x = osh
+# print(osh)
+# print(c)
+
+sys.exit(x)
