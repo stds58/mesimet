@@ -1,0 +1,28 @@
+from UstKolvo import UstKolvo
+
+class SdelatPole(UstKolvo):
+    pole = None
+
+    def __init__(self, kolvo, pole= {}):
+        self.kolvo = kolvo
+        self.pole = pole
+
+    def set_pole(self, kolvo):
+        storona = range(1, kolvo + 1)
+        pole = {str(i) + str(j): ' О ' for j in storona for i in storona}
+        self.pole = pole
+        # if kolvo >= 1 and kolvo <= 10 and isinstance(kolvo, int):
+        #     storona = range(1, kolvo + 1)
+        #     pole = {str(i) + str(j): ' О ' for j in storona for i in storona}
+        #     self.pole = pole
+    def get_pole(self):
+        return self.pole
+
+if __name__ == "__main__":
+   k=SdelatPole(kolvo = 3)
+   #k.set_pole(-4)
+   kk = k.get_pole()
+   print( kk )
+   print(k.get_kolvo())
+
+
