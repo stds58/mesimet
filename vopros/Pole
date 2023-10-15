@@ -30,13 +30,13 @@ class Pole():
         return self.pole
 
     #вывод поля
-    def set_doska(self):
+    def set_doska(self, pole):
         #sl = dict(sorted(self.pole.items()))
         doska = ' |'
         for i in range(1, self.kolvo + 1):
             doska = doska + ' ' + str(i) + ' |'
 
-        for kluc, znacenie in self.pole.items():
+        for kluc, znacenie in pole.items():
             doska = doska + '\n' + str(kluc) + '|'
             for i in znacenie:
                 doska = doska + i + '|'
@@ -46,20 +46,20 @@ class Pole():
         return self.doska
 
     #изменить значение в поле
-    def set_koor(self, x, y, znac):
+    def set_koor(self, x, y, znac, pole):
         if znac == ' О ' or znac == ' ■ ' or znac == ' X ' or znac == ' T ':
             self.znac = znac
         else:
             self.znac = ' О '
 
         if x >= 1 and x <= self.kolvo and isinstance(x, int) and y >= 1 and y <= self.kolvo and isinstance(y, int):
-            kl = self.pole.get(x)
+            kl = pole.get(x)
             kl[y-1] = znac
-            self.pole[x] = kl
+            pole[x] = kl
         else:
-            kl = self.pole.get(1)
+            kl = pole.get(1)
             kl[0] = znac
-            self.pole[1] = kl
+            pole[1] = kl
 
 
 
@@ -67,11 +67,12 @@ a = Pole(4)
 a.set_kolvo()
 a.get_kolvo()
 a.set_pole()
-a.get_pole()
-a.set_doska()
+k = a.get_pole()
+a.set_doska(k)
 f2 = a.get_doska()
 print(f2)
 print('-------------')
-a.set_koor(2, 2, ' X ')
+a.set_koor(2, 2, ' X ', k)
+a.set_doska(k)
 f2 = a.get_doska()
 print(f2)
