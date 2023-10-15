@@ -1,0 +1,77 @@
+class Pole():
+    def __init__(self, kolvo = None, x=1, y=1, znac = None, pole = {}, doska = ''):
+        self.kolvo = kolvo
+        self.x = x
+        self.y = y
+        self.znac = znac
+        self.pole = pole
+        self.doska = doska
+
+    def set_kolvo(self):
+        if isinstance(self.kolvo, int):
+            if self.kolvo >= 1 and self.kolvo <= 10:
+                self.kolvo = self.kolvo
+            else:
+                self.kolvo = 1
+        else:
+            'ошибка'
+
+    def get_kolvo(self):
+        return self.kolvo
+
+    #создать поле
+    def set_pole(self):
+        storona = range(1, self.kolvo + 1)
+        #pole = {str(i) +'-'+ str(j): ' О ' for j in storona for i in storona}
+        pole = {j: [' О ' for i in storona] for j in storona}
+        self.pole = dict(sorted(pole.items()))
+
+    def get_pole(self):
+        return self.pole
+
+    #вывод поля
+    def set_doska(self):
+        #sl = dict(sorted(self.pole.items()))
+        doska = ' |'
+        for i in range(1, self.kolvo + 1):
+            doska = doska + ' ' + str(i) + ' |'
+
+        for kluc, znacenie in self.pole.items():
+            doska = doska + '\n' + str(kluc) + '|'
+            for i in znacenie:
+                doska = doska + i + '|'
+        self.doska = doska
+
+    def get_doska(self):
+        return self.doska
+
+    #изменить значение в поле
+    def set_koor(self, x, y, znac):
+        if znac == ' О ' or znac == ' ■ ' or znac == ' X ' or znac == ' T ':
+            self.znac = znac
+        else:
+            self.znac = ' О '
+
+        if x >= 1 and x <= self.kolvo and isinstance(x, int) and y >= 1 and y <= self.kolvo and isinstance(y, int):
+            kl = self.pole.get(x)
+            kl[y-1] = znac
+            self.pole[x] = kl
+        else:
+            kl = self.pole.get(1)
+            kl[0] = znac
+            self.pole[1] = kl
+
+
+
+a = Pole(4)
+a.set_kolvo()
+a.get_kolvo()
+a.set_pole()
+a.get_pole()
+a.set_doska()
+f2 = a.get_doska()
+print(f2)
+print('-------------')
+a.set_koor(2, 2, ' X ')
+f2 = a.get_doska()
+print(f2)
