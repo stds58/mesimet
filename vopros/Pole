@@ -1,4 +1,4 @@
-class Pole():
+class Pole:
     def __init__(self, kolvo = None, x=1, y=1, znac = None, pole = {}, doska = ''):
         self.kolvo = kolvo
         self.x = x
@@ -76,3 +76,5 @@ a.set_koor(2, 2, ' X ', k)
 a.set_doska(k)
 f2 = a.get_doska()
 print(f2)
+print('-------------')
+print(a.doska)
