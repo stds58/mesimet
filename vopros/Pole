@@ -1,3 +1,11 @@
+class StaticClass:
+
+    @staticmethod
+    def bar():
+        return [' О ',' ■ ',' X ',' T ']
+
+#print(StaticClass.bar())
+
 class Doska:
     storona_min = 4
     storona_max = 20
@@ -50,7 +58,8 @@ class Doska:
                 self.koordX = None
                 self.koordY = None
                 print('координаты x,y вышли за рамки диапазона')
-            if znacenie == ' О ' or znacenie == ' ■ ' or znacenie == ' X ' or znacenie == ' T ':
+            #if znacenie == ' О ' or znacenie == ' ■ ' or znacenie == ' X ' or znacenie == ' T ':
+            if znacenie in StaticClass.bar():
                 self.znacenie = znacenie
             else:
                 self.znacenie = None
