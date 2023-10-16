@@ -1,80 +1,101 @@
-class Pole:
-    def __init__(self, kolvo = None, x=1, y=1, znac = None, pole = {}, doska = ''):
-        self.kolvo = kolvo
-        self.x = x
-        self.y = y
-        self.znac = znac
-        self.pole = pole
-        self.doska = doska
+class Doska:
+    storona_min = 4
+    storona_max = 20
+    def __init__(self, storona = None):
+        self.storona = storona
+        self.doska = self.set_doska
 
-    def set_kolvo(self):
-        if isinstance(self.kolvo, int):
-            if self.kolvo >= 1 and self.kolvo <= 10:
-                self.kolvo = self.kolvo
-            else:
-                self.kolvo = 1
-        else:
-            'ошибка'
-
-    def get_kolvo(self):
-        return self.kolvo
-
-    #создать поле
-    def set_pole(self):
-        storona = range(1, self.kolvo + 1)
-        #pole = {str(i) +'-'+ str(j): ' О ' for j in storona for i in storona}
-        pole = {j: [' О ' for i in storona] for j in storona}
-        self.pole = dict(sorted(pole.items()))
-
-    def get_pole(self):
-        return self.pole
-
-    #вывод поля
-    def set_doska(self, pole):
-        #sl = dict(sorted(self.pole.items()))
-        doska = ' |'
-        for i in range(1, self.kolvo + 1):
-            doska = doska + ' ' + str(i) + ' |'
-
-        for kluc, znacenie in pole.items():
-            doska = doska + '\n' + str(kluc) + '|'
-            for i in znacenie:
-                doska = doska + i + '|'
-        self.doska = doska
-
-    def get_doska(self):
+    #сделать доску
+    @property
+    def set_doska(self):
+        d = range(1, self.storona + 1)
+        self.doska = [[' О ' for i in d] for j in d]
         return self.doska
 
-    #изменить значение в поле
-    def set_koor(self, x, y, znac, pole):
-        if znac == ' О ' or znac == ' ■ ' or znac == ' X ' or znac == ' T ':
-            self.znac = znac
+    @set_doska.setter
+    def set_doska(self):
+        if isinstance(self.storona, int):
+            if self.storona >= self.storona_min and self.storona <= self.storona_max:
+                self.storona = self.storona
+            else:
+                self.storona = self.storona_min
         else:
-            self.znac = ' О '
+            self.storona = self.storona_min
 
-        if x >= 1 and x <= self.kolvo and isinstance(x, int) and y >= 1 and y <= self.kolvo and isinstance(y, int):
-            kl = pole.get(x)
-            kl[y-1] = znac
-            pole[x] = kl
+    #поменять значение в ячейке доски
+    @property
+    def set_kletka(self):
+        return self.doska
+
+    @set_kletka.setter
+    def set_kletka(self, value):
+        # if stroka.find(',') >= 0:
+        #     zapros = stroka.split(',')
+        try:
+            koordX = int(value[0]) - 1
+            koordY = int(value[1]) - 1
+            znacenie = str(value[2])
+            #type(pl1.set_doska)
+        except ValueError:
+            print('x,y не числа')
+        except IndexError:
+            print('не введено новое значение клетки')
+        # except AttributeError:
+        #     print('AttributeError')
         else:
-            kl = pole.get(1)
-            kl[0] = znac
-            pole[1] = kl
+            if koordX >= 0 and koordX < self.storona and koordY >= 0 and koordY < self.storona:
+                self.koordX = koordX
+                self.koordY = koordY
+            else:
+                self.koordX = None
+                self.koordY = None
+                print('координаты x,y вышли за рамки диапазона')
+            if znacenie == ' О ' or znacenie == ' ■ ' or znacenie == ' X ' or znacenie == ' T ':
+                self.znacenie = znacenie
+            else:
+                self.znacenie = None
+                print('новое значение клетки вне списка установленных значений')
+            if self.koordX is not None and self.koordX is not None and self.znacenie is not None:
+                self.doska[self.koordX][self.koordY] = self.znacenie
+
+    #получить значение ячейки доски
+    @property
+    def get_cell(self):
+        if self.koordX is None and self.koordX is None:
+            return ''
+        else:
+            return self.doska[self.koordX][self.koordY]
+
+    @get_cell.setter
+    def get_cell(self, value):
+        # if stroka.find(',') >= 0:
+        #     zapros = stroka.split(',')
+        try:
+            koordX = int(value[0]) - 1
+            koordY = int(value[1]) - 1
+            #type(pl1.set_doska)
+        except ValueError as e:
+            print('x,y не числа')
+        except AttributeError:
+            print('AttributeError')
+        else:
+            if koordX >= 0 and koordX < self.storona and koordY >= 0 and koordY < self.storona:
+                self.koordX = koordX
+                self.koordY = koordY
+            else:
+                self.koordX = None
+                self.koordY = None
+                print('koordXY--')
+
+    def __str__(self):
+        return '\n'.join([f"{ii}|{'|'.join(i)}|" for i,ii in zip(self.doska,range(1,self.storona+1))])
 
 
-
-a = Pole(4)
-a.set_kolvo()
-a.get_kolvo()
-a.set_pole()
-k = a.get_pole()
-a.set_doska(k)
-f2 = a.get_doska()
-print(f2)
-print('-------------')
-a.set_koor(2, 2, ' X ', k)
-a.set_doska(k)
-f2 = a.get_doska()
-print(f2)
-print('-------------')
-print(a.doska)
+pl1 = Doska(6)
+#x = input('ввести значение:')
+#pl1.set_kletka = x
+pl1.set_kletka = [2,4,' ■ ']
+print(pl1)
+print('--------------')
+pl1.get_cell = [4,1]
+print(pl1.get_cell)
