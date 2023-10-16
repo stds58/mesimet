@@ -1,28 +1,68 @@
-from UstKolvo import UstKolvo
+from Doska import Doska
 
-class SdelatPole(UstKolvo):
-    pole = None
+class Ship:
+    def __init__(self, obj_doska):
+        self.obj_doska = obj_doska
+        #self.korabl = korabl
 
-    def __init__(self, kolvo, pole= {}):
-        self.kolvo = kolvo
-        self.pole = pole
+    @property
+    def set_ship(self):
+        return self.korabl
 
-    def set_pole(self, kolvo):
-        storona = range(1, kolvo + 1)
-        pole = {str(i) + str(j): ' О ' for j in storona for i in storona}
-        self.pole = pole
-        # if kolvo >= 1 and kolvo <= 10 and isinstance(kolvo, int):
-        #     storona = range(1, kolvo + 1)
-        #     pole = {str(i) + str(j): ' О ' for j in storona for i in storona}
-        #     self.pole = pole
-    def get_pole(self):
-        return self.pole
+    @set_ship.setter
+    def set_ship(self, value):
+        try:
+            dlina = int(value[0])
+            koordX = int(value[1])
+            koordY = int(value[2])
+            napravlenie = value[3]
+            korabl = []
+        except ValueError:
+            print('x,y не числа')
+        except IndexError:
+            print('не введено новое значение клетки')
+        else:
+            if dlina >=1 and dlina <=3:
+                self.dlina = dlina
+            else:
+                self.dlina = None
+                print('координаты dlina вышли за рамки диапазона')
 
-if __name__ == "__main__":
-   k=SdelatPole(kolvo = 3)
-   #k.set_pole(-4)
-   kk = k.get_pole()
-   print( kk )
-   print(k.get_kolvo())
+            if koordX >= 0 and koordX < self.obj_doska.storona:
+                self.koordX = koordX
+            else:
+                self.koordX = None
+                print('координаты x вышли за рамки диапазона')
+
+            if koordY >= 0 and koordY < self.obj_doska.storona:
+                self.koordY = koordY
+            else:
+                self.koordY = None
+                print('координаты y вышли за рамки диапазона')
+
+            if napravlenie in ['В','П','Н','Л']:
+                self.napravlenie = napravlenie
+            else:
+                self.napravlenie = None
+                print('napravlenie вышло за рамки диапазона')
+
+            if self.dlina is not None and self.koordX is not None and self.koordY is not None and self.napravlenie is not None:
+                korabl.append(self.koordX)
+                korabl.append(self.koordY)
+                self.korabl = korabl
 
 
+
+pl1 = Doska(6)
+pl1.set_kletka = [2,4,' ■ ']
+#print(pl1)
+#print('--------------')
+#pl1.get_cell = [4,1]
+#print(pl1.get_cell)
+#print(pl1.storona)
+
+b = Ship(pl1)
+b.set_ship = [3, 2, 4, 'Н']
+print(b.set_ship)
+pl1.get_cell = b.set_ship
+print(pl1.get_cell)
