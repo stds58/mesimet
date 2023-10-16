@@ -64,7 +64,7 @@ class Doska:
             else:
                 self.znacenie = None
                 print('новое значение клетки вне списка установленных значений')
-            if self.koordX is not None and self.koordX is not None and self.znacenie is not None:
+            if self.koordX is not None and self.koordY is not None and self.znacenie is not None:
                 self.doska[self.koordX][self.koordY] = self.znacenie
 
     #получить значение ячейки доски
