@@ -159,7 +159,6 @@ class Doska():
             if x[3] in ['В', 'П', 'Н', 'Л']:
                 b = Ship(x[0],x[1],x[2],x[3])
                 self.ustanovit_korabl(b.korabl)
-                self.obvodka_korabla(b.korabl)
                 if self.status:
                     print(self.status)
                 if self.status:
