@@ -25,8 +25,8 @@ class Igra:
         self.imja = input('введите ваше имя:')
         storona = self.proverka_int('введите ширину доски:', 6, 20)
         pl1 = Doska(storona)
-        #pl1.igrok_rasstanovka()
-        pl1.auto_rasstanovka()
+        pl1.igrok_rasstanovka()
+        #pl1.auto_rasstanovka()
         print(pl1)
         print(pl1.status)
         print('-------------')
@@ -35,8 +35,6 @@ class Igra:
         pl2.auto_rasstanovka()
         #print(pl2)
         print(pl2.status)
-        #print(pl2.doska)
-        #print(pl2.doska_komp)
         print('-------------')
 
         while len(pl1.spisok_ship) and len(pl2.spisok_ship):
@@ -53,8 +51,6 @@ class Igra:
             if len(pl1.spisok_ship) and len(pl2.spisok_ship):
                 #print(pl1)
                 print(f'ходит комп')
-                #print(f'доска комп\n{pl2}')
-                #print(f'комп сюда стреляет\n{pl1}')
                 auto = True
                 pl1.hod(auto)
             else:
@@ -63,8 +59,6 @@ class Igra:
         # print(pl1)
         # print('----------')
         # print(pl2)
-
-# нельзя бить в одно и то же место
 
 igra = Igra()
 igra.proces()
