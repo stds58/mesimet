@@ -43,7 +43,6 @@ class Ship:
             for j1, j2 in zip(i1, range(self.len_doska)):
                 if j1 == ' О ':
                     L.append([i2, j2])
-        #print('L',L)
         if len(L):
             if kolvo_ship[3] > 0:
                 self.dlina = 3
