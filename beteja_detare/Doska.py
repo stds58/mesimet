@@ -9,6 +9,7 @@ class Doska():
         self.status = self.ustanovit_korabl
         self.kolvo_ship = [1, 4, 2, 1]
         self.spisok_ship = []
+        self.spisok_obvodka = []
         self.auto = auto
 
 
@@ -28,7 +29,6 @@ class Doska():
                 L_temp.append(j)
             self.doska_dublazh.append(L_temp)
         self.len_doska = len(obj_doska)
-        L_shablon = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 0], [0, 1], [1, -1], [1, 0], [1, 1]]
         # удалить занятые ячейки
         for i1, i2 in zip(self.doska_dublazh, range(self.len_doska)):
             for j1, j2 in zip(i1, range(self.len_doska)):
@@ -57,6 +57,28 @@ class Doska():
                 [f"{ii:02}|{'|'.join(i)}|" for i, ii in zip(self.doska, range(1, self.storona + 1))])
         return self.stroka
 
+
+    # обводка подбитого корабля
+    def obvodka_korabla(self):
+        # установить область вокруг кораблей
+        self.spisok_obvodka = []
+        L_shablon = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 0], [0, 1], [1, -1], [1, 0], [1, 1]]
+        for obj_ship in self.spisok_ship:
+            L = []
+            for i in obj_ship.korabl:
+                for j in L_shablon:
+                    a = i[0] + j[0]
+                    b = i[1] + j[1]
+                    if [a, b] not in L and a >= 0 and b >= 0 and a < self.storona and b < self.storona:
+                        L.append([a, b])
+            # добавить обводку
+            for j in obj_ship.korabl:
+                for i in L:
+                    if i == j:
+                        L.remove(j)
+            self.spisok_obvodka.append(L)
+
+
     #проверка корабля
     def ustanovit_korabl(self, obj_ship):
         #obj_ship = b.korabl [[4, 2], [3, 2], [2, 2]]
@@ -67,7 +89,6 @@ class Doska():
                 if i[0] < 0 or i[0] >= self.storona or i[1] < 0 or i[1] >= self.storona:
                     self.status = "клетка за гранью доски"
             break
-
         # установить область вокруг корабля
         self.oblast = []
         L_shablon = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 0], [0, 1], [1, -1], [1, 0], [1, 1]]
@@ -77,19 +98,16 @@ class Doska():
                 b = i[1] + j[1]
                 if [a, b] not in self.oblast and a >= 0 and b >= 0 and a < self.storona and b < self.storona:
                     self.oblast.append([a, b])
-
         # проверить область корабля
         for i in self.oblast:
             if self.doska[i[0]][i[1]] == ' ■ ':
                 self.status = 'клетка занята'
                 break
-
         # проверить количество кораблей
         if not self.status:
             dlina = len(obj_ship)
             if not self.kolvo_ship[dlina]:
                 self.status = 'корабль такой длины  больше уже нельзя поставить'
-
         # запись допустимого корабля
         if not self.status:
             for i in obj_ship:
@@ -141,6 +159,7 @@ class Doska():
             if x[3] in ['В', 'П', 'Н', 'Л']:
                 b = Ship(x[0],x[1],x[2],x[3])
                 self.ustanovit_korabl(b.korabl)
+                self.obvodka_korabla(b.korabl)
                 if self.status:
                     print(self.status)
                 if self.status:
@@ -163,6 +182,7 @@ class Doska():
                 self.spisok_ship.append(b)
             if self.status == 'все корабли расставлены':
                 self.spisok_ship.append(b)
+                self.obvodka_korabla()
                 break
             i += 1
             if i > self.storona**2 and self.kolvo_ship[0] == 1:
@@ -192,16 +212,19 @@ class Doska():
                     for ii, jj in zip(l_ship, range(len(l_ship))):  # взять координаты корабля [2, 2]
                         if [x, y] == ii:
                             self.spisok_ship[j].korabl.pop(jj)
-                            #print(self.spisok_ship[j].korabl)
                             if not self.spisok_ship[j].korabl:
                                 self.spisok_ship.pop(j)
+                                for i in self.spisok_obvodka[j]: #обвести подбитый корабль
+                                    self.doska[ i[0] ][ i[1] ] = ' T '
+                                self.spisok_obvodka.pop(j)
                                 print(self.__str__())
                                 print('подбит')
-                                if not len(self.spisok_ship):
-                                    print('победа')
                             else:
                                 print(self.__str__())
-                                print('попадание')
+                                print('ранен')
+            elif self.doska[x][y] == ' T ' or self.doska[x][y] == ' X ':
+                print(self.__str__())
+                print('сюда уже стреляли. повторите заново\n')
             else:
                 self.doska[x][y] = ' T '
                 print('промах\n')
@@ -228,5 +251,3 @@ class Doska():
         x = L[i][0]
         y = L[i][1]
         return x, y
-
-
