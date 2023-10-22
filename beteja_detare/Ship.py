@@ -1,33 +1,18 @@
 
+import random
+
 class Ship:
-    dlina_min = 1
-    dlina_max = 3
-    def __init__(self, dlina = None, koordX = None, koordY = None, napravlenie = None, oshibka = False):
+    def __init__(self, dlina, koordX, koordY, napravlenie):
         self.dlina = dlina
-        self.koordX = koordX
-        self.koordY = koordY
+        self.koordX = koordX - 1
+        self.koordY = koordY - 1
         self.napravlenie = napravlenie
-        self.oshibka = oshibka
-        self.korabl = []
-        self.oblast = []
+        self.korabl = self.set_ship
 
-    def set_param(self, dlina, koordX, koordY, napravlenie):
-        self.dlina = dlina
-        self.koordX = koordX
-        self.koordY = koordY
-        self.napravlenie = napravlenie
 
-    def get_ship(self):
-        return self.korabl
-
+    @property
     def set_ship(self):
         self.korabl = []
-        if self.dlina < self.dlina_min or self.dlina > self.dlina_max:
-            self.oshibka = f'допустимая длина от {self.dlina_min} до {self.dlina_max}'
-
-        if self.napravlenie not in ['В', 'П', 'Н', 'Л']:
-            self.oshibka = f'допустимое направление {self.napravlenie}'
-
         for i in range(self.dlina):
             L = []
             if self.napravlenie == 'В':
@@ -46,68 +31,32 @@ class Ship:
                 L.append(self.koordX)
                 L.append(self.koordY - i)
                 self.korabl.append(L)
+        return self.korabl
 
-    def set_oblast(self, L):
-        self.oblast = []
-        L_shablon = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 0], [0, 1], [1, -1], [1, 0], [1, 1]]
-        #self.oblast = []
-        for i in L:
-            for j in L_shablon:
-                a = i[0] + j[0]
-                b = i[1] + j[1]
-                if [a, b] not in self.oblast and a >= 0 and b >= 0:
-                    self.oblast.append([a, b])
 
-    def get_oblast(self):
-        return self.oblast
+    # случайные координаты одной клетки
+    def rand_ship(self, obj_doska, obj_doska_dublazh, kolvo_ship):
+        self.len_doska = len(obj_doska)
+        L = []
+        # создать список доступных координат
+        for i1, i2 in zip(obj_doska_dublazh, range(self.len_doska)):
+            for j1, j2 in zip(i1, range(self.len_doska)):
+                if j1 == ' О ':
+                    L.append([i2, j2])
+        #print('L',L)
+        if len(L):
+            if kolvo_ship[3] > 0:
+                self.dlina = 3
+            elif kolvo_ship[2] > 0:
+                self.dlina = 2
+            else:
+                self.dlina = 1
 
-    # def del_shqip(self):
-    #     self.korabl = []
-
-# from Doska import Doska
-# pl1 = Doska(6)
-# print(pl1)
-# #print(pl1.doska)
-# #print('--------------')
-# #print(pl1.storona)
-# b = Ship()
-# b.set_param(3, 0, 4, 'В')
-# b.set_ship()
-# print(b.get_ship())
-# for i in b.get_ship():
-#     pl1.doska[i[0]][i[1]] = ' ■ '
-#
-# b.set_oblast(b.get_ship())
-# #print(b.get_oblast())
-#
-# test = Doska(6)
-# for i in b.get_oblast():
-#     try:
-#         test.doska[i[0]][i[1]] = ' ■ '
-#     except IndexError as e:
-#         zaglushka = True
-# #----------
-# b = Ship()
-# b.set_param(3, 5, 5, 'В')
-# b.set_ship()
-# for i in b.get_ship():
-#     pl1.doska[i[0]][i[1]] = ' ■ '
-# b.set_oblast(b.get_ship())
-# for i in b.get_oblast():
-#     try:
-#         test.doska[i[0]][i[1]] = ' ■ '
-#     except IndexError as e:
-#         zaglushka = True
-# #---------
-# #print(pl1.doska)
-# print(pl1)
-# print('------------')
-# print(test.doska)
-# print(test)
-#print(b.oshibka)
-# pl1.set_proverka_cell(5, 5)
-# print(pl1.get_proverka_cell())
-# print(pl1.get_proverka_oshibka())
-# # print(pl1.get_proverka_cell())
-# print(pl1)
+            nomer = random.randrange(0, len(L), 1)
+            self.koordX = L[nomer][0]
+            self.koordY = L[nomer][1]
+            obj_doska_dublazh[self.koordX].pop(self.koordY)
+            self.napravlenie = random.choice(['В', 'П', 'Н', 'Л'])
+        self.koord = [self.dlina, self.koordX, self.koordY, self.napravlenie]
+        return self.koord
 
