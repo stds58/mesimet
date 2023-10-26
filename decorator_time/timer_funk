@@ -1,0 +1,29 @@
+
+from datetime import datetime
+
+def timer(funk):
+    def wrapper(*args, **kwargs):
+        start = datetime.utcnow()
+        result = funk(*args, **kwargs)
+        print(f'funkcion {funk.__name__} Time passed: {(datetime.utcnow() - start).total_seconds()}')
+        return result
+    return wrapper
+
+@timer
+def gnome_opt(data):
+    i, j, size = 1, 2, len(data)
+    while i < size:
+        if data[i - 1] <= data[i]:
+            i, j = j, j + 1
+        else:
+            data[i - 1], data[i] = data[i], data[i - 1]
+            i -= 1
+            if i == 0:
+                i, j = j, j + 1
+    return data
+
+data = [1,33,56,3,89,4,3,5,0,47658,34543,3412,67,7,5,4,32234,5,787,454,123,4,22,657,98,0,67,689,65,4,4321,24314,234,2346,467,32,1,4567,67,0,78,453,235,8,9,6446,3223,45]
+
+
+result = gnome_opt(data)
+print(result)
