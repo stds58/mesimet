@@ -1,0 +1,43 @@
+import sqlalchemy
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import MetaData
+from sqlalchemy import Column, Integer, String, NVARCHAR, Boolean, FLOAT, DATE, Index
+from sqlalchemy.dialects.mssql import SQL_VARIANT
+from sqlalchemy.schema import CreateSchema
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import hashlib
+
+
+class OsnModel(DeclarativeBase):
+    metadata=MetaData(schema = 'data1')
+
+class Data(OsnModel):
+    __tablename__ =  'tabledata'
+    f1 = Column("field1", NVARCHAR(2), nullable=True)
+    f2 = Column("field2" , NVARCHAR(14), nullable=True)
+    f3 = Column("field3", NVARCHAR(255), nullable=True)
+    f4 = Column("field4", NVARCHAR(9), nullable=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
+    hash_sha3_512 = Column("hash_sha3_512", NVARCHAR(128), nullable=True)
+
+
+def get_engine(hostname, dbname, user, pwd):
+    engine = create_engine(
+        f"mssql+pyodbc://{user}:{pwd}@{hostname}/{dbname}"
+        "?driver=ODBC+Driver+17+for+SQL+Server",
+        fast_executemany=True, echo=False)
+    return engine
+
+engine = get_engine('***', '***', '***', '***')
+Session = sessionmaker(autoflush=False, bind=engine)
+with Session(autoflush=False, bind=engine) as db:
+    L = []
+    df = db.query(Data).filter(Data.hash_sha3_512.is_(None)).all()
+    for p in df:
+        row = f"{p.f1}{p.f2}{p.f3}{p.f4}"
+        value = hashlib.sha3_512(row.encode('utf-8')).hexdigest()
+        L.append(dict(id=p.id, hash_sha3_512=value))
+
+    db.bulk_update_mappings(Data, L)
+    db.commit()
