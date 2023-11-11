@@ -17,7 +17,9 @@ def f_user(message):
 
 def proverka_lang(func):
     def wrapper(message: telebot.types.Message):
-        if not len(dic_person_lang):
+        try:
+            dic_person_lang[message.from_user.id]
+        except Exception:
             for key,value in dic_lang.items():
                 bot.send_message(message.chat.id, f"{key} {value}\n")
         else:
@@ -37,8 +39,6 @@ def handle_language(message: telebot.types.Message):
 @proverka_lang
 def handle_start(message: telebot.types.Message):
     user = f_user(message)  # message.chat.first_name,message.chat.first_name,message.chat.username
-    print(dic_person_lang)
-    print('----')
     lang = dic_person_lang[message.from_user.id][1:]
     bot.send_message(message.chat.id, f"{dic_help[lang][2]} {user} \n {dic_help[lang][1]}")
 
@@ -48,6 +48,7 @@ def handle_start(message: telebot.types.Message):
 def handle_help(message: telebot.types.Message):
     user = f_user(message)
     dic_person_lang[message.from_user.id] = message.text #добавить выбранный язык в словарь
+    #print(dic_person_lang)
     try:
         try:
             bot.send_message(message.chat.id,f"{dic_help[message.text[1:]][2]} {user} \n {dic_help[message.text[1:]][1]}")
@@ -74,3 +75,8 @@ def handle_request(message: telebot.types.Message):
 
 
 bot.polling(none_stop=True)
+
+
+
+
+
