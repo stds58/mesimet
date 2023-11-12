@@ -19,21 +19,23 @@ class APIException(Exception):
 class ValutaConverter:
     @staticmethod
     def get_price(message: telebot.types.Message):
-        lang = dic_person_lang[message.from_user.id][1:]
-        print('вставка ',lang)
-        L = message.text.split(' ')
+        lang = dic_person_lang[message.from_user.id][1:] #в словаре язык записан как '/sq' а нужно получить 'sq'
+        text = message.text.lower()
+        L = text.split(' ')
 
         try:
             if len(L) != 3:
                 raise APIException(f"неверно введены параметры {message.text}")
 
             try:
-                base = dic_help[lang][3][L[0]]
+                valuta1 = L[0]
+                base = dic_help[lang]['valuta_list'][valuta1]
             except KeyError:
                 raise APIException(f"неверно указана первая валюта {L[0]}")
 
             try:
-                quote = dic_help[lang][3][L[1]]
+                valuta2 = L[1]
+                quote = dic_help[lang]['valuta_list'][valuta2]
             except KeyError:
                 raise APIException(f"неверно указана вторая валюта {L[1]}")
 
