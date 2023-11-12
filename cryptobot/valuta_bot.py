@@ -40,7 +40,7 @@ def handle_language(message: telebot.types.Message):
 def handle_start(message: telebot.types.Message):
     user = f_user(message)  # message.chat.first_name,message.chat.first_name,message.chat.username
     lang = dic_person_lang[message.from_user.id][1:]
-    bot.send_message(message.chat.id, f"{dic_help[lang][2]} {user} \n {dic_help[lang][1]}")
+    bot.send_message(message.chat.id, f"{dic_help[lang]['приветствие']} {user} \n {dic_help[lang]['help']}")
 
 
 #выбор языка
@@ -51,7 +51,8 @@ def handle_help(message: telebot.types.Message):
     #print(dic_person_lang)
     try:
         try:
-            bot.send_message(message.chat.id,f"{dic_help[message.text[1:]][2]} {user} \n {dic_help[message.text[1:]][1]}")
+            lang_mess = message.text[1:] #убираем / из '/ru'
+            bot.send_message(message.chat.id,f"{dic_help[lang_mess]['приветствие']} {user} \n {dic_help[lang_mess]['help']}")
         except KeyError:
             raise APIException(f"не переведён диалог для вашего языка")
     except APIException as e:
@@ -62,8 +63,8 @@ def handle_help(message: telebot.types.Message):
 @proverka_lang
 def handle_valuta(message: telebot.types.Message):
     lang = dic_person_lang[message.from_user.id][1:]
-    bot.send_message(message.chat.id, dic_help[lang][4])
-    for key2, value2 in dic_help[lang][3].items():
+    bot.send_message(message.chat.id, dic_help[lang]['dialog_valuta'])
+    for key2, value2 in dic_help[lang]['valuta_list'].items():
         bot.send_message(message.chat.id, f"{key2} {value2}")
 
 
@@ -75,8 +76,3 @@ def handle_request(message: telebot.types.Message):
 
 
 bot.polling(none_stop=True)
-
-
-
-
-
