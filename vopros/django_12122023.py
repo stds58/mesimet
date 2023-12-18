@@ -24,8 +24,8 @@ POSITIONS = [
 
 class Staff(models.Model):
     full_name = models.CharField(max_length=255)
-    labor_contract = models.IntegerField
     position = models.CharField(max_length=2,choices=POSITIONS,default=cashier)
+    labor_contract = models.IntegerField()
 
     def get_last_name(self):
         return self.full_name.split()[0]
@@ -35,7 +35,7 @@ class Staff(models.Model):
 
 class Order (models.Model):
     time_in = models.DateTimeField(auto_now_add=True)
-    time_out = models.DateTimeField
+    time_out = models.DateTimeField()
     cost = models.FloatField(default=0.0)
     pickup = models.BooleanField(default=False)
     complete = models.BooleanField(default=False)
@@ -87,4 +87,3 @@ class ProductOrder(models.Model):
 
 #python manage.py makemigrations
 #python manage.py migrate
-
